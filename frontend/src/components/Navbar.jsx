@@ -8,7 +8,7 @@ const Navbar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Container maxW={"1140px"} px={4}>
+    <Container maxW={"container.xl"} px={4}>
       <Flex
         h={16}
         alignItems={"center"}
@@ -23,7 +23,7 @@ const Navbar = () => {
             textAlign={"center"}
             bgGradient={"linear(to-r, cyan.400, blue.500)"}
           >
-            Product Store
+            Product Store 🐶
           </Text>
         </Link>
 

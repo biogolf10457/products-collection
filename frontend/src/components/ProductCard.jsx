@@ -3,22 +3,56 @@ import {
   Button,
   Heading,
   HStack,
-  IconButton,
   Image,
   Text,
+  VStack,
+  Input,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import { useColorModeValue } from "./ui/color-mode";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { useProductStore } from "../store/product";
 import { Toaster, toaster } from "../components/ui/toaster";
+import {
+  DialogActionTrigger,
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
 
 const ProductCard = ({ product }) => {
+  const [updatedProduct, setUpdatedProduct] = useState(product);
   const textColor = useColorModeValue("gray.600", "gray.200");
   const bg = useColorModeValue("white", "gray.800");
+  const editButtonColor = useColorModeValue("gray.600", "gray.200");
 
-  const { deleteProduct } = useProductStore();
+  const { updateProduct, deleteProduct } = useProductStore();
+  const handleUpdateProduct = async (pid, updatedProduct) => {
+    const { success, message } = await updateProduct(pid, updatedProduct);
+    if (!success) {
+      toaster.create({
+        title: "Error",
+        description: message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toaster.create({
+        title: "Success",
+        description: "Product updated successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
   const handleDeleteProduct = async (pid) => {
     const { success, message } = await deleteProduct(pid);
     if (!success) {
@@ -52,7 +86,7 @@ const ProductCard = ({ product }) => {
       <Image
         src={product.image}
         alt={product.name}
-        h={48}
+        h={64}
         w={"full"}
         objectFit={"cover"}
       />
@@ -66,9 +100,71 @@ const ProductCard = ({ product }) => {
         </Text>
 
         <HStack spacing={2}>
-          <Button bgColor={"gray.200"}>
-            <FaEdit />
-          </Button>
+          <DialogRoot>
+            <DialogTrigger asChild>
+              <Button bgColor={editButtonColor}>
+                <FaEdit />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <Heading as={"h3"} size={"md"} mb={2} textAlign={"center"}>
+                  Edit Product
+                </Heading>
+              </DialogHeader>
+              <DialogBody>
+                <VStack spacing={4}>
+                  <Input
+                    placeholder="Product Name"
+                    name="name"
+                    value={updatedProduct.name}
+                    onChange={(e) =>
+                      setUpdatedProduct({
+                        ...updatedProduct,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                  <Input
+                    placeholder="Price"
+                    name="price"
+                    type="number"
+                    value={updatedProduct.price}
+                    onChange={(e) =>
+                      setUpdatedProduct({
+                        ...updatedProduct,
+                        price: e.target.value,
+                      })
+                    }
+                  />
+                  <Input
+                    placeholder="Image URL"
+                    name="image"
+                    value={updatedProduct.image}
+                    onChange={(e) =>
+                      setUpdatedProduct({
+                        ...updatedProduct,
+                        image: e.target.value,
+                      })
+                    }
+                  />
+                </VStack>
+              </DialogBody>
+              <DialogFooter>
+                <DialogActionTrigger asChild>
+                  <Button
+                    onClick={() =>
+                      handleUpdateProduct(product._id, updatedProduct)
+                    }
+                  >
+                    Save
+                  </Button>
+                </DialogActionTrigger>
+              </DialogFooter>
+              <DialogCloseTrigger />
+            </DialogContent>
+          </DialogRoot>
+
           <Button
             bgColor={"red.400"}
             onClick={() => handleDeleteProduct(product._id)}
