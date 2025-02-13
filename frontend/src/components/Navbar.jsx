@@ -29,7 +29,7 @@ const Navbar = () => {
 
         <HStack spacing={2} alignItems={"center"}>
           <Link to={"/create"}>
-            <Button>Test</Button>
+            <Button>Create</Button>
           </Link>
           <Button onClick={toggleColorMode}>
             {colorMode === "light" ? <IoMoon /> : <LuSun />}
